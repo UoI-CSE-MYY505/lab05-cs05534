@@ -2,7 +2,6 @@
 # lab05.s 
 #  Verifies the correctness of some aspects of a 5-stage pipelined RISC-V implementation
 # ----------------------------------------------------------------------------------------
-
 .data
 storage:
     .word 1
@@ -33,7 +32,7 @@ storage:
 # ----------------------------------------------------------------------------------------
 # Verify load-use 1 cycle stall and correct passing of load's value
     lw   t3, 4(a0)
-    add  t4, zero, t3   # t4 should be storage[1] = 10
+    add  t4, zero, t3 
     # nop instructions added between examples
     add  zero, zero, zero  
     add  zero, zero, zero  
@@ -42,6 +41,11 @@ storage:
 # ----------------------------------------------------------------------------------------
 # Check how many cycles are lost due to pipe flush following a jump.
 # Also verify that the instruction(s) following the jump are not executed (i.e. writing to a register)
+    lw   t3, 4(a0)
+    add  t4, zero, t3 
+    add  zero, zero, zero  
+    add  zero, zero, zero  
+    add  zero, zero, zero  
     j    next
     add  t5, s1, s2
     add  t6, s1, s2
@@ -63,10 +67,20 @@ next:
     add  t0, zero, s3
     add  t1, zero, s2
 taken:
-
+    add  t1, s0, s1   
+    addi t2, s0, s2  
+    add  t3, t1, s3  
+# ----------------------------------------------------------------------------------------
+    # nop instructions added between examples
+    add  zero, zero, zero  
+    add  zero, zero, zero  
+    add  zero, zero, zero  
 # ----------------------------------------------------------------------------------------
 # TODO: Add an example where an instruction passes its result to the 2nd following instruction
 # There should be no stalls
+    add  t1, s0, s1   # t1 = 1
+    addi t1, s0, s2   # t1 = 2
+    add  t3, t1, s3 
 # ----------------------------------------------------------------------------------------
     # nop instructions added between examples
     add  zero, zero, zero  
@@ -80,6 +94,9 @@ taken:
 # There should be no stalls
 # ----------------------------------------------------------------------------------------
     # nop instructions added between examples
+    add  t1, s0, s1   # t1 = 1
+    addi t1, s0, s2   # t1 = 2
+    add  t3, t1, s3 
     add  zero, zero, zero  
     add  zero, zero, zero  
     add  zero, zero, zero  
@@ -88,7 +105,8 @@ taken:
 # TODO: Add an example with a load stalling for 1 cycle to pass a value to a NOT-TAKEN branch 
 #  Is this a data hazard or a control hazard?
 # ----------------------------------------------------------------------------------------
-    # nop instructions added between examples
+    lw   t3, 4(a0)
+    beq  t3, zero, exit
     add  zero, zero, zero  
     add  zero, zero, zero  
     add  zero, zero, zero  
@@ -96,9 +114,10 @@ taken:
 # ----------------------------------------------------------------------------------------
 # TODO: Add an example with taken branch to a label which is immediately following the branch
 # ----------------------------------------------------------------------------------------
-
-
-
+    beq  zero, s0, nextInstr
+nextInstr:
+    add  t0, s1, s2
+    add  t1, s2, s3 
 exit:  
     addi      a7, zero, 10    
     ecall
